@@ -16,6 +16,8 @@ config :rest_web_proxy, RestWebProxyWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+config :rest_web_proxy, :http_client, RestWebProxy.HttpClient.Service
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

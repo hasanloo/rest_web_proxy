@@ -56,4 +56,6 @@ config :phoenix, :stacktrace_depth, 20
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
 
+config :rest_web_proxy, :http_client, RestWebProxy.HttpClient.Service
+
 config :rest_web_proxy, :proxies, test: "https://en8m2ly5vtjxa.x.pipedream.net/?test=123"

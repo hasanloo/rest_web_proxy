@@ -16,3 +16,9 @@ config :rest_web_proxy, RestWebProxyWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :rest_web_proxy, :http_client, RestWebProxy.HttpClient.ServiceMock
+
+config :rest_web_proxy, :proxies,
+  test_noparams: "https://en8m2ly5vtjxa.x.pipedream.net",
+  test: "https://en8m2ly5vtjxa.x.pipedream.net/?test=123"

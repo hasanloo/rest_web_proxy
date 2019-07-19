@@ -1,7 +1,7 @@
 defmodule RestWebProxyWeb.ProxyController do
   use RestWebProxyWeb, :controller
 
-  import Logger
+  @http_client Application.get_env(:rest_web_proxy, :http_client)
 
   def sync_post(conn, %{"proxy" => proxy} = params) do
     proxy_url =
@@ -13,10 +13,15 @@ defmodule RestWebProxyWeb.ProxyController do
     headers = get_headers(conn)
     post_params = get_params(params)
 
-    case HTTPoison.post(proxy_url, {:form, post_params}, headers) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> conn |> send_resp(200, body)
-      {:ok, %HTTPoison.Response{status_code: 404}} -> conn |> send_resp(404, "")
-      {:error, %HTTPoison.Error{reason: reason}} -> conn |> send_resp(500, reason)
+    case @http_client.post(proxy_url, {:form, post_params}, headers) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        conn |> put_resp_content_type("application/json") |> send_resp(200, body)
+
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        conn |> put_resp_content_type("application/json") |> send_resp(404, "")
+
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        conn |> put_resp_content_type("application/json") |> send_resp(500, reason)
     end
   end
 
@@ -29,10 +34,15 @@ defmodule RestWebProxyWeb.ProxyController do
 
     headers = get_headers(conn)
 
-    case HTTPoison.get(proxy_url, headers) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> conn |> send_resp(200, body)
-      {:ok, %HTTPoison.Response{status_code: 404}} -> conn |> send_resp(404, "")
-      {:error, %HTTPoison.Error{reason: reason}} -> conn |> send_resp(500, reason)
+    case @http_client.get(proxy_url, headers) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        conn |> put_resp_content_type("application/json") |> send_resp(200, body)
+
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        conn |> put_resp_content_type("application/json") |> send_resp(404, "")
+
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        conn |> put_resp_content_type("application/json") |> send_resp(500, reason)
     end
   end
 
@@ -45,11 +55,10 @@ defmodule RestWebProxyWeb.ProxyController do
     post_params = get_params(params)
 
     Task.start(fn ->
-      HTTPoison.post(proxy_url, {:form, post_params}, headers)
+      @http_client.post(proxy_url, {:form, post_params}, headers)
     end)
 
-    conn
-    |> send_resp(200, "OK")
+    json(conn, %{success: true})
   end
 
   def async_get(conn, %{"proxy" => proxy} = params) do
@@ -62,11 +71,10 @@ defmodule RestWebProxyWeb.ProxyController do
     headers = get_headers(conn)
 
     Task.start(fn ->
-      response = HTTPoison.get(proxy_url, headers)
+      @http_client.get(proxy_url, headers)
     end)
 
-    conn
-    |> send_resp(200, "OK")
+    json(conn, %{success: true})
   end
 
   defp get_url(url, "") do
@@ -92,14 +100,14 @@ defmodule RestWebProxyWeb.ProxyController do
 
   defp get_headers(conn) do
     conn.req_headers
-    |> Enum.filter(fn {key, value} ->
+    |> Enum.filter(fn {key, _value} ->
       !Enum.member?(["content-length", "host", "user-agent"], key)
     end)
   end
 
   defp get_params(params) do
     params
-    |> Enum.filter(fn {key, value} -> !Enum.member?(["proxy"], key) end)
+    |> Enum.filter(fn {key, _value} -> !Enum.member?(["proxy"], key) end)
   end
 
   defp get_proxy_url(params, proxy) do
