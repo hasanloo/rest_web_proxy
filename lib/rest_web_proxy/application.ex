@@ -3,6 +3,8 @@ defmodule RestWebProxy.Application do
   # for more information on OTP Applications
   @moduledoc false
 
+  alias RestWebProxyWeb.Endpoint
+
   use Application
 
   def start(_type, _args) do
@@ -11,7 +13,7 @@ defmodule RestWebProxy.Application do
       # Start the Ecto repository
       RestWebProxy.Repo,
       # Start the endpoint when the application starts
-      RestWebProxyWeb.Endpoint
+      Endpoint
       # Starts a worker by calling: RestWebProxy.Worker.start_link(arg)
       # {RestWebProxy.Worker, arg},
     ]
@@ -25,7 +27,7 @@ defmodule RestWebProxy.Application do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    RestWebProxyWeb.Endpoint.config_change(changed, removed)
+    Endpoint.config_change(changed, removed)
     :ok
   end
 end

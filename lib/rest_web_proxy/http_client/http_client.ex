@@ -1,4 +1,8 @@
 defmodule RestWebProxy.HttpClient.Service do
+  @moduledoc """
+  Http client service
+  """
+
   @behaviour RestWebProxy.HttpClient.Behaviour
 
   def get(url, headers \\ []) do

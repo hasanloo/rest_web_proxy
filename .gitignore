@@ -27,6 +27,10 @@ rest_web_proxy-*.tar
 # this depending on your deployment strategy.
 /priv/static/
 
+# dialyxir plt files
+/priv/plts/*.plt
+/priv/plts/*.plt.hash
+
 # vim temp files
 *.swp
 *.swo

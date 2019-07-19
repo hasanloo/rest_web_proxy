@@ -3,9 +3,9 @@ use Mix.Config
 # Configure your database
 config :rest_web_proxy, RestWebProxy.Repo,
   username: "postgres",
-  password: "postgres",
+  password: "",
   database: "rest_web_proxy_dev",
-  hostname: "localhost",
+  hostname: "db",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
